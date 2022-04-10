@@ -1,8 +1,8 @@
 #include <future>
 #include <list>
 
-#ifndef IMAGE_PROCESSING_MODULE_H
-#define IMAGE_PROCESSING_MODULE_H
+#ifndef THREADED_QUEUE
+#define THREADED_QUEUE
 
 template <class T>
 class ThreadedQueue {
@@ -89,4 +89,4 @@ T ThreadedQueue<T>::dequeue() {
     return item;
 }
 
-#endif  // IMAGE_PROCESSING_MODULE
+#endif  // THREADED_QUEUE
