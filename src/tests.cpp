@@ -146,4 +146,63 @@ TEST_CASE("ReplacingBuffer") {
             CHECK(buffer.extract() == "SECOND");
         }
     }
+    SECTION("Simple thread") {
+        ReplacingBuffer<string> buffer{};
+
+        thread th{[&](ReplacingBuffer<string> *buffer){
+            this_thread::sleep_for(chrono::milliseconds(1));
+            string str{"FIRST"};
+            buffer->store(str);
+        }, &buffer};
+
+        CHECK(buffer.empty());
+        CHECK(buffer.extract() == "FIRST");  // Blocks until full
+
+        th.join();
+    }
+    SECTION("More threads") {
+        ReplacingBuffer<string> buffer{};
+
+        thread th1{[&](ReplacingBuffer<string> *buffer){
+            this_thread::sleep_for(chrono::milliseconds(1));
+            string str{"FIRST"};
+            buffer->store(str);
+        }, &buffer};
+
+        thread th2{[&](ReplacingBuffer<string> *buffer){
+            this_thread::sleep_for(chrono::milliseconds(2));
+            string str{"SECOND"};
+            buffer->store(str);
+        }, &buffer};
+
+        CHECK(buffer.empty());
+        CHECK(buffer.extract() == "FIRST");  // Blocks until full
+        CHECK(buffer.extract() == "SECOND");  // Blocks until full
+
+        th1.join();
+        th2.join();
+    }
+    SECTION("More threads overwrite") {
+        ReplacingBuffer<string> buffer{};
+
+        thread th1{[&](ReplacingBuffer<string> *buffer){
+            this_thread::sleep_for(chrono::milliseconds(1));
+            string str{"FIRST"};
+            buffer->store(str);
+        }, &buffer};
+
+        thread th2{[&](ReplacingBuffer<string> *buffer){
+            this_thread::sleep_for(chrono::milliseconds(2));
+            string str{"SECOND"};
+            buffer->store(str);
+        }, &buffer};
+
+        CHECK(buffer.empty());
+        th1.join();
+        CHECK(buffer.full());
+        th2.join();
+        CHECK(buffer.extract() == "SECOND");
+        CHECK(buffer.empty());
+
+    }
 }
