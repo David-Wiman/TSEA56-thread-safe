@@ -129,6 +129,7 @@ TEST_CASE("ReplacingBuffer") {
         CHECK(buffer.full() == true);
         CHECK(buffer.empty() == false);
         CHECK(buffer.extract() == 1);
+        CHECK(buffer.empty() == true);
         buffer.store(two);
         buffer.store(three);
         CHECK(buffer.extract() == 3);

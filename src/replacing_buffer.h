@@ -24,6 +24,7 @@ public:
     /* Replaces item if buffer full. Never blocks.*/
     void store(T &item);
 
+    /* Wait till the buffer isn't full. */
     void wait_if_full();
 
     /* Extract item. Blocks if buffer empty. */
@@ -83,6 +84,7 @@ T ReplacingBuffer<T>::extract() {
         was_full = has_item;
         cv.wait(lk, [this]{return has_item;});
         item = std::move(buffer);
+        has_item = false;
     }
     if (was_full) {
         cv.notify_all();
