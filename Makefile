@@ -1,5 +1,5 @@
 # Folders
-SRC_DIR = src
+SRC_DIR = tests
 OBJ_DIR := build
 
 # Compiler

@@ -1,6 +1,6 @@
 #include "catch.hpp"
-#include "threaded_queue.h"
-#include "replacing_buffer.h"
+#include "../threaded_queue.h"
+#include "../replacing_buffer.h"
 
 #include <string>
 #include <iostream>
