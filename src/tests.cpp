@@ -1,5 +1,6 @@
 #include "catch.hpp"
 #include "threaded_queue.h"
+#include "replacing_buffer.h"
 
 #include <string>
 #include <iostream>
@@ -7,7 +8,7 @@
 #include <chrono>
 
 using namespace std;
-TEST_CASE("Basics") {
+TEST_CASE("Threaded queue") {
     SECTION("int") {
         ThreadedQueue<int> int_queue{};
         CHECK( int_queue.empty() );
@@ -38,10 +39,7 @@ TEST_CASE("Basics") {
         no_limit_queue.enqueue(1);
         CHECK( no_limit_queue.full() == false);
     }
-}
-
-TEST_CASE("Theaded") {
-    SECTION("Basic") {
+    SECTION("Basic threading") {
         ThreadedQueue<int> int_queue{};
 
         thread th{[&](ThreadedQueue<int> *int_queue){
@@ -116,5 +114,35 @@ TEST_CASE("Theaded") {
         th1.join();
         th2.join();
         th3.join();
+    }
+}
+
+TEST_CASE("ReplacingBuffer") {
+    SECTION("Basics") {
+        ReplacingBuffer<int> buffer{};
+        int one{1};
+        int two{2};
+        int three{3};
+        CHECK(buffer.full() == false);
+        CHECK(buffer.empty() == true);
+        buffer.store(one);
+        CHECK(buffer.full() == true);
+        CHECK(buffer.empty() == false);
+        CHECK(buffer.extract() == 1);
+        buffer.store(two);
+        buffer.store(three);
+        CHECK(buffer.extract() == 3);
+    }
+    SECTION("Larger data types and scopes") {
+        ReplacingBuffer<string> buffer{};
+        {
+            string str1{"FIRST"};
+            string str2{"SECOND"};
+            buffer.store(str1);
+            buffer.store(str2);
+        }
+        {
+            CHECK(buffer.extract() == "SECOND");
+        }
     }
 }
