@@ -4,6 +4,15 @@
 #ifndef REPLACING_BUFFER
 #define REPLACING_BUFFER
 
+/* A thread safe buffer which overwrites the old value when storing more.
+ *
+ * Note that the item passed to replacing_buffer.store(item) will be passed by
+ * reference and moved. It can not be used again without extracting it from the
+ * buffer.
+ *
+ * Also note that passing pointers to the class will result in memory leaks.
+ */
+
 template <class T>
 class ReplacingBuffer {
 public:
@@ -12,12 +21,12 @@ public:
     bool empty();
     bool full();
 
-    /* Replaces item if buffer full. */
+    /* Replaces item if buffer full. Never blocks.*/
     void store(T &item);
 
     void wait_if_full();
 
-    /* Blocks if buffer empty. */
+    /* Extract item. Blocks if buffer empty. */
     T extract();
 
 private:
